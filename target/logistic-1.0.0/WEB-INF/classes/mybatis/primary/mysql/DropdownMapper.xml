@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dt.student.register.mapper.primary.dropDown.DropDownMapper">
+
+    <select id="getUserDropDown" parameterType="com.dt.student.register.model.base.filter.Filter" >
+        SELECT
+        id AS id,
+        username AS username
+        FROM users
+        <if test="searchText != null and searchText != ''">
+            AND name LIKE CONCAT('%', #{searchText}, '%')
+        </if>
+        ORDER BY id ASC
+    </select>
+
+    <select id="getGroupDropDown" parameterType="com.dt.student.register.model.base.filter.Filter" >
+        SELECT
+        id AS id,
+        name AS name
+        FROM groups
+        <if test="searchText != null and searchText != ''">
+            AND name LIKE CONCAT('%', #{searchText}, '%')
+        </if>
+        ORDER BY id ASC
+    </select>
+
+    <select id="getBranchDropDown" parameterType="com.dt.student.register.model.base.filter.Filter" >
+        SELECT
+        id AS id,
+        name AS name
+        FROM branches
+        <if test="searchText != null and searchText != ''">
+            AND name LIKE CONCAT('%', #{searchText}, '%')
+        </if>
+        ORDER BY id ASC
+    </select>
+
+    <select id="getProgramDropDown" parameterType="com.dt.student.register.model.base.filter.Filter" >
+        SELECT
+        id AS id,
+        name AS name,
+        tuition_fee AS price
+        FROM programs
+        <if test="searchText != null and searchText != ''">
+            AND name LIKE CONCAT('%', #{searchText}, '%')
+        </if>
+        ORDER BY id ASC
+    </select>
+
+</mapper>

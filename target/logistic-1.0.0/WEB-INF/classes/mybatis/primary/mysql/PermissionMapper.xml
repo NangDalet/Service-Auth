@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dt.student.register.mapper.primary.user.PermissionMapper">
+
+    <select id="checkPermission" resultType="java.lang.Long">
+        SELECT
+            COUNT(id)
+        FROM
+            permissions
+        WHERE
+            group_id IN (
+                SELECT group_id FROM user_groups WHERE user_id = #{userId}
+            )
+          AND module_id IN (
+            SELECT id FROM modules WHERE name = #{moduleName} AND status = 1
+        )
+    </select>
+
+
+    <insert id="insert">
+        INSERT INTO permissions (
+            group_id,
+            module_id
+        ) VALUES (
+                     #{roleId},
+                     #{moduleId}
+                 )
+    </insert>
+
+    <insert id="delete">
+        DELETE FROM permissions WHERE group_id = #{roleId}
+    </insert>
+
+    <select id="getPermissionCodesByUserId" resultType="java.lang.String">
+        SELECT DISTINCT
+            CONCAT(
+                    REPLACE(UPPER(modules.name), ' ', '_'),
+                    '_',
+                    CASE
+                        WHEN modules.name LIKE '%(%)%'
+                            THEN UPPER(TRIM(TRAILING ')' FROM SUBSTRING_INDEX(SUBSTRING_INDEX(modules.name, '(', -1), ')', 1)))
+                        ELSE 'VIEW'
+                        END
+            ) AS permission
+        FROM permissions
+                 INNER JOIN modules ON modules.id = permissions.module_id
+        WHERE permissions.group_id IN (
+            SELECT group_id
+            FROM user_groups
+            WHERE user_id = #{userId}
+        )
+    </select>
+
+
+
+
+</mapper>

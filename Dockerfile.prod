@@ -1,0 +1,67 @@
+# Production-Ready Dockerfile
+# Multi-stage build for optimized image size
+
+# Stage 1: Builder
+FROM maven:3.9-eclipse-temurin-21 AS builder
+
+WORKDIR /build
+
+COPY . .
+
+# Build the application
+RUN mvn clean package -DskipTests=true
+
+# Stage 2: Runtime
+FROM eclipse-temurin:21-jre-alpine
+
+# Install curl for health checks
+RUN apk add --no-cache curl
+
+WORKDIR /app
+
+# Create non-root user for security
+RUN addgroup -g 1001 -S appuser && \
+    adduser -u 1001 -S appuser -G appuser
+
+# Copy JAR from builder stage
+COPY --from=builder /build/target/logistic-1.0.0.jar app.jar
+
+# Change ownership
+RUN chown -R appuser:appuser /app
+
+# Switch to non-root user
+USER appuser
+
+# Expose port
+EXPOSE 4800
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD curl -f http://localhost:4800/auth/actuator/health || exit 1
+
+# JVM optimization for containers
+ENV JAVA_OPTS="\
+  -Xmx512m \
+  -Xms256m \
+  -XX:+UseG1GC \
+  -XX:MaxGCPauseMillis=200 \
+  -XX:+ParallelRefProcEnabled \
+  -XX:+UnlockDiagnosticVMOptions \
+  -XX:G1SummarizeRSetStatsPeriod=1 \
+  -XX:+AlwaysPreTouch \
+  -XX:+PrintTenuringDistribution \
+  -XX:+PrintGCDetails \
+  -XX:+PrintGCTimeStamps \
+  -Xloggc:/var/log/gc.log \
+  -XX:+UseGCLogFileRotation \
+  -XX:NumberOfGCLogFiles=10 \
+  -XX:GCLogFileSize=100M"
+
+# Start the application
+ENTRYPOINT exec java $JAVA_OPTS -jar /app/app.jar
+
+# Labels
+LABEL maintainer="your-email@domain.com"
+LABEL version="1.0.0"
+LABEL description="SERVICE-AUTH Microservice"
+
