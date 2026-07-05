@@ -1,9 +1,13 @@
-FROM eclipse-temurin:21-jre
+FROM maven:3.9.9-eclipse-temurin-21 AS build
 
 WORKDIR /app
+COPY pom.xml .
+COPY src ./src
+RUN mvn clean package -DskipTests
 
-COPY target/logistic-1.0.0.war app.war
+FROM eclipse-temurin:21-jre-alpine
 
-EXPOSE 4800
+WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
 
-ENTRYPOINT ["java", "-jar", "/app/app.war"]
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]
