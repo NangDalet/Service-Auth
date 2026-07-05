@@ -4,15 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c0186358-5b73-40fe-8682-3711d53fc9c7" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/application-dev.properties" beforeDir="false" afterPath="$PROJECT_DIR$/application-dev.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/application-prod.properties" beforeDir="false" afterPath="$PROJECT_DIR$/application-prod.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/logistic-1.0.0.war" beforeDir="false" afterPath="$PROJECT_DIR$/target/logistic-1.0.0.war" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/logistic-1.0.0.war.original" beforeDir="false" afterPath="$PROJECT_DIR$/target/logistic-1.0.0.war.original" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/logistic-1.0.0/WEB-INF/classes/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/target/logistic-1.0.0/WEB-INF/classes/application.properties" afterDir="false" />
-    </list>
+    <list default="true" id="c0186358-5b73-40fe-8682-3711d53fc9c7" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -42,6 +34,7 @@
     "RequestMappingsPanelWidth0": "75",
     "RequestMappingsPanelWidth1": "75",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
     "Spring Boot.Application.executor": "Run",
     "copilot.chat.legacySessionMetadata.migrated": "true",
     "git-widget-placeholder": "main",
@@ -94,6 +87,7 @@
       <updated>1783172763949</updated>
       <workItem from="1783172765375" duration="300000" />
       <workItem from="1783173378981" duration="2775000" />
+      <workItem from="1783222445576" duration="65000" />
     </task>
     <servers />
   </component>
