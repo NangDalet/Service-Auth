@@ -4,7 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c0186358-5b73-40fe-8682-3711d53fc9c7" name="Changes" comment="" />
+    <list default="true" id="2a8209fd-493e-4b30-a92e-85d9e4c9649d" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.fastRequest/config/fastRequestCurrentProjectEnvironment.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -12,16 +17,16 @@
   </component>
   <component name="CopilotPersistence">
     <persistenceIdMap>
-      <entry key="_D:/Lesson/StudentRegisterMicro/V4/ServiceAuth" value="3G2blgTmpzWm4sw00S8oLofN6G4" />
+      <entry key="_D:/Lesson/StudentRegisterMicro/V4/ServiceAuth" value="3G4FPHNpq7EWtpdE2KDtmREfe4i" />
     </persistenceIdMap>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo">{
-  &quot;associatedIndex&quot;: 4
-}</component>
-  <component name="ProjectId" id="3G2blgTmpzWm4sw00S8oLofN6G4" />
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 4
+}]]></component>
+  <component name="ProjectId" id="3G4FPHNpq7EWtpdE2KDtmREfe4i" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -29,20 +34,12 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RequestMappingsPanelOrder0": "0",
-    "RequestMappingsPanelOrder1": "1",
-    "RequestMappingsPanelWidth0": "75",
-    "RequestMappingsPanelWidth1": "75",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "Spring Boot.Application.executor": "Run",
     "copilot.chat.legacySessionMetadata.migrated": "true",
     "git-widget-placeholder": "main",
     "last_opened_file_path": "D:/Lesson/StudentRegisterMicro/V4/ServiceAuth",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
     "project.structure.last.edited": "SDKs",
     "project.structure.proportion": "0.0",
@@ -80,14 +77,12 @@
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="c0186358-5b73-40fe-8682-3711d53fc9c7" name="Changes" comment="" />
-      <created>1783172763949</created>
+      <changelist id="2a8209fd-493e-4b30-a92e-85d9e4c9649d" name="Changes" comment="" />
+      <created>1783222908811</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1783172763949</updated>
-      <workItem from="1783172765375" duration="300000" />
-      <workItem from="1783173378981" duration="2775000" />
-      <workItem from="1783222445576" duration="65000" />
+      <updated>1783222908811</updated>
+      <workItem from="1783222909992" duration="227000" />
     </task>
     <servers />
   </component>
