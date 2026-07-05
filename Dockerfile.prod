@@ -23,8 +23,8 @@ WORKDIR /app
 RUN addgroup -g 1001 -S appuser && \
     adduser -u 1001 -S appuser -G appuser
 
-# Copy JAR from builder stage
-COPY --from=builder /build/target/logistic-1.0.0.jar app.jar
+# Copy executable Spring Boot WAR from builder stage
+COPY --from=builder /build/target/logistic-1.0.0.war app.jar
 
 # Change ownership
 RUN chown -R appuser:appuser /app
@@ -46,16 +46,8 @@ ENV JAVA_OPTS="\
   -XX:+UseG1GC \
   -XX:MaxGCPauseMillis=200 \
   -XX:+ParallelRefProcEnabled \
-  -XX:+UnlockDiagnosticVMOptions \
-  -XX:G1SummarizeRSetStatsPeriod=1 \
   -XX:+AlwaysPreTouch \
-  -XX:+PrintTenuringDistribution \
-  -XX:+PrintGCDetails \
-  -XX:+PrintGCTimeStamps \
-  -Xloggc:/var/log/gc.log \
-  -XX:+UseGCLogFileRotation \
-  -XX:NumberOfGCLogFiles=10 \
-  -XX:GCLogFileSize=100M"
+  -Xlog:gc*:stdout:time,uptime,level,tags"
 
 # Start the application
 ENTRYPOINT exec java $JAVA_OPTS -jar /app/app.jar
