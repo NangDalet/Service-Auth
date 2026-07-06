@@ -25,6 +25,7 @@ public class JwtUtil {
 
     private final PrivateKey privateKey;
     private final JwtParser jwtParser;
+    private final String keyId;
 
     private static final String TOKEN_TYPE = "Bearer";
     private static final String SCOPE = "read write trust";
@@ -48,6 +49,7 @@ public class JwtUtil {
         this.privateKey = (PrivateKey) loadKey(privateKeyPath, true);
         PublicKey publicKey = (PublicKey) loadKey(publicKeyPath, false);
         this.jwtParser = Jwts.parser().verifyWith(publicKey).build();
+        this.keyId = generateKeyId(publicKey);
     }
 
     private Key loadKey(String filePath, boolean isPrivate) throws SecurityException {
@@ -109,17 +111,29 @@ public class JwtUtil {
 
 
     public String refreshAccessToken(String refreshToken) {
-        Claims claims = jwtParser.parseSignedClaims(refreshToken).getPayload();
+        Claims claims = parseClaims(refreshToken);
 
         Long userId = claims.get("id", Long.class);
         String username = claims.getSubject();
 
         // 🔥 roles & permissions will be reloaded from DB
-        return createToken(
-                Map.of("id", userId, "sub", username),
-                accessTokenExpirationMs,
-                TokenType.ACCESS
-        );
+        Map<String, Object> refreshedClaims = new HashMap<>();
+        refreshedClaims.put("id", userId);
+        refreshedClaims.put("sub", username);
+        refreshedClaims.put("aud", audience);
+        refreshedClaims.put("scope", SCOPE);
+
+        Object roles = claims.get("roles");
+        if (roles != null) {
+            refreshedClaims.put("roles", roles);
+        }
+
+        Object permissions = claims.get("permissions");
+        if (permissions != null) {
+            refreshedClaims.put("permissions", permissions);
+        }
+
+        return createToken(refreshedClaims, accessTokenExpirationMs, TokenType.ACCESS);
     }
 
     private Map<String, Object> createClaims(
@@ -136,6 +150,7 @@ public class JwtUtil {
         claims.put("jti", UUID.randomUUID().toString());
         claims.put("iss", issuer);
         claims.put("aud", audience);
+        claims.put("scope", SCOPE);
         return claims;
     }
 
@@ -146,10 +161,11 @@ public class JwtUtil {
         Date now = new Date();
         return Jwts.builder()
                 .claims(claims)
+                .claim("token_type", tokenType.toString())
                 .issuedAt(now)
                 .expiration(new Date(now.getTime() + duration))
                 .issuer(issuer)
-                .header().add("kid", generateKeyId(privateKey)).and()
+                .header().add("kid", keyId).and()
                 .signWith(privateKey, Jwts.SIG.RS256)
                 .compact();
     }
@@ -158,7 +174,7 @@ public class JwtUtil {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] keyHash = digest.digest(key.getEncoded());
-            return Base64.getUrlEncoder().encodeToString(keyHash).substring(0, 10);
+            return Base64.getUrlEncoder().withoutPadding().encodeToString(keyHash).substring(0, 16);
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException("SHA-256 algorithm is not available.", e);
         }
@@ -169,13 +185,17 @@ public class JwtUtil {
     }
 
     private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        Claims claims = jwtParser.parseSignedClaims(token).getPayload();
+        Claims claims = parseClaims(token);
         return claimsResolver.apply(claims);
+    }
+
+    public Claims parseClaims(String token) {
+        return jwtParser.parseSignedClaims(token).getPayload();
     }
 
     public boolean validateToken(String token) {
         try {
-            jwtParser.parseSignedClaims(token);
+            parseClaims(token);
             return true;
         } catch (JwtException e) {
             logger.warn("❌ Invalid JWT: {}", e.getMessage());
