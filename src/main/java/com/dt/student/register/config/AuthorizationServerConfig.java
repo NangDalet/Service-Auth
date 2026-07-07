@@ -1,5 +1,6 @@
 package com.dt.student.register.config;
 
+import com.dt.student.register.authentication.filter.GatewayOnlyFilter;
 import com.dt.student.register.model.users.CustomUserDetails;
 import com.dt.student.register.service.AuthorizationUserClaimsService;
 import com.nimbusds.jose.jwk.JWKSet;
@@ -27,6 +28,7 @@ import org.springframework.security.oauth2.server.authorization.config.annotatio
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.security.KeyFactory;
 import java.security.MessageDigest;
@@ -44,7 +46,8 @@ public class AuthorizationServerConfig {
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
     public org.springframework.security.web.SecurityFilterChain authorizationServerSecurityFilterChain(
-            HttpSecurity http
+            HttpSecurity http,
+            GatewayOnlyFilter gatewayOnlyFilter
     ) throws Exception {
         OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
 
@@ -61,7 +64,8 @@ public class AuthorizationServerConfig {
                                 },
                                 request -> request.getRequestURI().contains("/oauth2/")
                         )
-                );
+                )
+                .addFilterBefore(gatewayOnlyFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

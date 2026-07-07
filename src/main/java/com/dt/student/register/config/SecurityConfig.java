@@ -1,6 +1,7 @@
 package com.dt.student.register.config;
 
 import com.dt.student.register.authentication.filter.CustomCorsFilter;
+import com.dt.student.register.authentication.filter.GatewayOnlyFilter;
 import com.dt.student.register.authentication.filter.JwtRequestFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,7 +34,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, GatewayOnlyFilter gatewayOnlyFilter) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session ->
@@ -51,9 +52,15 @@ public class SecurityConfig {
                 )
                 // ✅ Filters are now properly ordered
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(customCorsFilter, JwtRequestFilter.class);
+                .addFilterBefore(gatewayOnlyFilter, JwtRequestFilter.class)
+                .addFilterBefore(customCorsFilter, GatewayOnlyFilter.class);
 
         return http.build();
+    }
+
+    @Bean
+    public GatewayOnlyFilter gatewayOnlyFilter() {
+        return new GatewayOnlyFilter();
     }
 
     @Bean
