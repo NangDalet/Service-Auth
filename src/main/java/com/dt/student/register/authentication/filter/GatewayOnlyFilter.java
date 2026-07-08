@@ -45,7 +45,8 @@ public class GatewayOnlyFilter extends OncePerRequestFilter {
                 || path.startsWith("/swagger-ui")
                 || path.startsWith("/v3/api-docs")
                 || path.startsWith("/api-docs")
-                || path.equals("/swagger-ui.html");
+                || path.equals("/swagger-ui.html")
+                || path.startsWith("/api/auth/");
     }
 
     private boolean isGatewayRequest(HttpServletRequest request) {
