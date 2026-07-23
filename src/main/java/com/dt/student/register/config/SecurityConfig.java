@@ -3,20 +3,27 @@ package com.dt.student.register.config;
 import com.dt.student.register.authentication.filter.CustomCorsFilter;
 import com.dt.student.register.authentication.filter.GatewayOnlyFilter;
 import com.dt.student.register.authentication.filter.JwtRequestFilter;
+import com.dt.student.register.mapper.primary.auth.AuthMapper;
+import com.dt.student.register.mapper.primary.user.PermissionMapper;
+import com.dt.student.register.mapper.primary.user.RoleMapper;
+import com.dt.student.register.model.users.CustomUserDetails;
+import com.dt.student.register.model.users.User;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
+
+import java.util.LinkedHashSet;
 
 @Configuration
 @EnableWebSecurity
@@ -64,14 +71,38 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration authenticationConfiguration
-    ) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder(10);
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(10);
+    public UserDetailsService userDetailsService(
+            AuthMapper authMapper,
+            RoleMapper roleMapper,
+            PermissionMapper permissionMapper
+    ) {
+        return username -> {
+            User user = authMapper.findUserDetails(username);
+            if (user == null) {
+                throw new UsernameNotFoundException("User not found");
+            }
+
+            LinkedHashSet<SimpleGrantedAuthority> authorities = new LinkedHashSet<>();
+            roleMapper.getRoleNamesByUserId(user.getId()).stream()
+                    .filter(role -> role != null && !role.isBlank())
+                    .map(SimpleGrantedAuthority::new)
+                    .forEach(authorities::add);
+            permissionMapper.getPermissionCodesByUserId(user.getId()).stream()
+                    .filter(permission -> permission != null && !permission.isBlank())
+                    .map(SimpleGrantedAuthority::new)
+                    .forEach(authorities::add);
+
+            return new CustomUserDetails(
+                    user.getId(),
+                    user.getUsername(),
+                    user.getPassword(),
+                    authorities
+            );
+        };
     }
 }

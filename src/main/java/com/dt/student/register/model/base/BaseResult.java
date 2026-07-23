@@ -10,14 +10,8 @@ public class BaseResult {
 
     private Boolean status;
 
-    private Integer msgCode;
-
     private String message;
 
-    private Pagination pagination;
-
-    private List data;
-
-    private Long id;
+    private List<?> data;
 
 }

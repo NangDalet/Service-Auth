@@ -40,21 +40,6 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Handle Token Related Exceptions
-     */
-    @ExceptionHandler({TokenNotFoundException.class, TokenInactiveException.class})
-    public ResponseEntity<ResponseMessage<Object>> handleTokenExceptions(Exception ex) {
-        log.warn("Token exception: {}", ex.getMessage());
-        ResponseMessage<Object> response = ResponseMessageUtils.makeResponse(
-                false, 
-                HttpStatus.UNAUTHORIZED.value(), 
-                "UNAUTHORIZED", 
-                ex.getMessage()
-        );
-        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
-    }
-
-    /**
      * Catch-all for any other Exception
      */
     @ExceptionHandler(Exception.class)

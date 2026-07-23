@@ -8,144 +8,50 @@ import org.springframework.validation.FieldError;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class ResponseMessageUtils {
+public final class ResponseMessageUtils {
 
-    /**
-     * Make success response
-     *
-     * @param body
-     * @return ResponseMessage<T>
-     */
-    public static <T> ResponseMessage<T> makeSuccessResponse(T body) {
-        ResponseMessage<T> response = new ResponseMessage<>();
-
-        ResponseHeader header = response.getHeader();
-        header.setResult(true);
-        header.setStatusCode(HttpStatus.OK.value());
-
-        if (body instanceof Boolean) {
-            return response;
-        }
-
-        response.setBody(body);
-
-        return response;
+    private ResponseMessageUtils() {
     }
 
-    /**
-     * Make success response with token and pagination
-     *
-     * @param body
-     * @param token
-     * @param pagination
-     * @return ResponseMessage<T>
-     */
-    public static <T> ResponseMessage<T> makeSuccessResponse(T body, String token, Pagination pagination) {
-        ResponseMessage<T> response = new ResponseMessage<>();
-
-        ResponseHeader header = response.getHeader();
-        header.setResult(true);
-        header.setStatusCode(HttpStatus.OK.value());
-        header.setToken(token);
-        header.setPagination(pagination);
-
-        if (body instanceof Boolean) {
-            return response;
-        }
-
-        response.setBody(body);
-
-        return response;
-    }
-
-    /**
-     * Make response with success status and body
-     *
-     * @param success
-     * @param body
-     * @return ResponseMessage<T>
-     */
     public static <T> ResponseMessage<T> makeResponse(boolean success, T body) {
         ResponseMessage<T> response = new ResponseMessage<>();
-
         ResponseHeader header = response.getHeader();
         header.setResult(success);
         header.setStatusCode(HttpStatus.OK.value());
-
         response.setBody(body);
-
         return response;
     }
 
-    /**
-     * Make response with error status and message
-     *
-     * @param success
-     * @param statusCode
-     * @param errorCode
-     * @param errorText
-     * @return ResponseMessage<T>
-     */
-    public static <T> ResponseMessage<T> makeResponse(boolean success, int statusCode, String errorCode, String errorText) {
+    public static <T> ResponseMessage<T> makeResponse(
+            boolean success,
+            int statusCode,
+            String errorCode,
+            String errorText
+    ) {
         ResponseMessage<T> response = new ResponseMessage<>();
-
         ResponseHeader header = response.getHeader();
         header.setResult(success);
         header.setStatusCode(statusCode);
         header.setErrorCode(errorCode);
         header.setErrorText(errorText);
-
         return response;
     }
 
-    /**
-     * Make response with error status from BindingResult
-     *
-     * @param success
-     * @param bindingResult
-     * @return ResponseMessage<T>
-     */
-    public static <T> ResponseMessage<T> makeResponse(boolean success, BindingResult bindingResult) {
-        ResponseMessage<T> response = new ResponseMessage<>();
-
-        Map<String, String> errorMessageList = new HashMap<>();
-        for (Object object : bindingResult.getAllErrors()) {
-            FieldError fieldError = (FieldError) object;
-            errorMessageList.put(fieldError.getField(), fieldError.getDefaultMessage());
+    public static <T> ResponseMessage<T> makeResponse(
+            boolean success,
+            BindingResult bindingResult
+    ) {
+        Map<String, String> errors = new HashMap<>();
+        for (Object error : bindingResult.getAllErrors()) {
+            FieldError fieldError = (FieldError) error;
+            errors.put(fieldError.getField(), fieldError.getDefaultMessage());
         }
 
+        ResponseMessage<T> response = new ResponseMessage<>();
         ResponseHeader header = response.getHeader();
         header.setResult(success);
         header.setStatusCode(HttpStatus.BAD_REQUEST.value());
-        header.setErrorText(new JSONObject(errorMessageList).toString());
-
-        return response;
-    }
-
-    /**
-     * Make response with BaseResult object
-     *
-     * @param success
-     * @param baseResult
-     * @return ResponseMessage<T>
-     */
-    public static <T> ResponseMessage<T> makeResponse(boolean success, BaseResult baseResult) {
-        ResponseMessage<T> response = new ResponseMessage<>();
-        ResponseHeader header = response.getHeader();
-        header.setResult(success);
-        header.setStatusCode(HttpStatus.OK.value());
-        response.setBody((T) baseResult);
-
-        return response;
-    }
-
-    public static <T> ResponseMessage<T> makeResponseByPermission(boolean success, BaseResult baseResult) {
-        ResponseMessage<T> response = new ResponseMessage<>();
-        ResponseHeader header = response.getHeader();
-        header.setResult(success);
-        header.setStatusCode(403);
-        response.setBody((T) baseResult);
-
+        header.setErrorText(new JSONObject(errors).toString());
         return response;
     }
 }

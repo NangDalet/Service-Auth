@@ -3,7 +3,6 @@ package com.dt.student.register.controller;
 import com.dt.student.register.model.dto.request.authentication.login.LoginRequest;
 import com.dt.student.register.authentication.helper.UserAuthSession;
 import com.dt.student.register.mapper.primary.auth.AuthMapper;
-import com.dt.student.register.model.base.MessageService;
 import com.dt.student.register.model.base.ResponseMessageUtils;
 import com.dt.student.register.model.base.BaseResult;
 import com.dt.student.register.model.base.ResponseMessage;
@@ -12,9 +11,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -24,22 +23,17 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
-    @Autowired
-    private AuthMapper authMapper;
-    @Value("${jwt.client.secret}")
-    private String clientSecret;
+    private final AuthMapper authMapper;
+    private final String clientSecret;
 
-    @Value("${jwt.access.token.expiration.ms}")
-    private Long tokenValidate;
-
-    @Value("${jwt.refresh.token.expiration.ms}")
-    private Long refreshTokenValidate;
-
-    @Autowired
-    private MessageService messageService;
-    @Autowired
-    public AuthController(AuthService authService) {
+    public AuthController(
+            AuthService authService,
+            AuthMapper authMapper,
+            @Value("${jwt.client.secret}") String clientSecret
+    ) {
         this.authService = authService;
+        this.authMapper = authMapper;
+        this.clientSecret = clientSecret;
     }
 
     // Login with username and password
@@ -54,27 +48,33 @@ public class AuthController {
         String deviceId = loginRequest.getDeviceId();
         String deviceName = loginRequest.getDeviceName();
 
-        // Input validation
-        if (!username.isEmpty() && !password.isEmpty() && !deviceId.isEmpty() && !deviceName.isEmpty()) {
-            Long checkUser = authMapper.checkUserValid(username);
-            if (checkUser > 0) {
-                // Convert expiration from ms to seconds
-                // 30 days = 30 * 24 * 3600 seconds = 2,592,000 seconds
-                long tokenValidate = 2_592_000L;
-                // 90 days = 90 * 24 * 3600 seconds = 7,776,000 seconds
-                long refreshTokenValidate = 7_776_000L;
-                if (authMapper.insertClientId(deviceId, deviceName, clientSecret, tokenValidate, refreshTokenValidate)) {
-                    authMapper.insertUserSession(username);
-                    return authService.handleLogin(loginRequest, request, response);
-                } else {
-                    return ResponseMessageUtils.makeResponse(false, 400, "Bad Request", "Invalid Parameter");
-                }
-            } else {
-                return ResponseMessageUtils.makeResponse(false, 401, "Unauthorized", "Invalid username and password");
-            }
-        } else {
+        if (!StringUtils.hasText(username)
+                || !StringUtils.hasText(password)
+                || !StringUtils.hasText(deviceId)
+                || !StringUtils.hasText(deviceName)) {
             return ResponseMessageUtils.makeResponse(false, 400, "Bad Request", "Invalid Parameter");
         }
+
+        if (authMapper.checkUserValid(username) == 0) {
+            return ResponseMessageUtils.makeResponse(false, 401, "Unauthorized", "Invalid username and password");
+        }
+
+        long accessTokenValiditySeconds = 2_592_000L;
+        long refreshTokenValiditySeconds = 7_776_000L;
+        boolean clientRegistered = Boolean.TRUE.equals(authMapper.insertClientId(
+                deviceId,
+                deviceName,
+                clientSecret,
+                accessTokenValiditySeconds,
+                refreshTokenValiditySeconds
+        ));
+
+        if (!clientRegistered) {
+            return ResponseMessageUtils.makeResponse(false, 400, "Bad Request", "Invalid Parameter");
+        }
+
+        authMapper.insertUserSession(username);
+        return authService.handleLogin(loginRequest, request, response);
     }
 
 

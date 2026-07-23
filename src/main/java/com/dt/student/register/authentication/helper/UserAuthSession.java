@@ -1,10 +1,8 @@
 package com.dt.student.register.authentication.helper;
 
-import com.dt.student.register.model.users.CustomUserDetails;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
